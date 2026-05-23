@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head><title>Test</title></head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+<script>
+  const e = React.createElement;
+  const App = () => e('div', { style: { color: 'white', background: '#6c63ff', padding: 20 } }, 'Hello Joboint – React is working!');
+  ReactDOM.createRoot(document.getElementById('root')).render(e(App));
+</script>
+</body>
+</html>
