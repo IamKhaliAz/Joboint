@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Joboint | نقطة التوظيف</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  /* ========== CSS (unchanged) ========== */
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a3d;
+    --accent: #6c63ff;
+    --accent2: #ff6584;
+    --accent3: #43e97b;
+    --text: #f0f0ff;
+    --text2: #9090b0;
+    --text3: #5a5a7a;
+    --gold: #ffd700;
+    --radius: 16px;
+    --shadow: 0 8px 32px rgba(108,99,255,0.15);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Tajawal', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  .app { min-height: 100vh; display: flex; flex-direction: column; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; width: 100%; }
+  .navbar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 0;
+  }
+  .navbar-inner {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 22px; font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -1px;
+    cursor: pointer;
+  }
+  .logo span { color: var(--accent2); }
+  .nav-actions { display: flex; gap: 12px; align-items: center; }
+  .lang-toggle {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  .lang-toggle:hover { border-color: var(--accent); color: var(--accent); }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 22px; border-radius: 10px; border: none;
+    font-family: 'Tajawal', sans-serif; font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; text-decoration: none;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(108,99,255,0.4);
+  }
+  .btn-primary:hover { background: #7c74ff; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(108,99,255,0.5); }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text2);
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-danger { background: #ff4466; color: #fff; }
+  .btn-success { background: var(--accent3); color: #0a0a0f; }
+  .btn-sm { padding: 7px 16px; font-size: 13px; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+  .hero {
+    padding: 80px 0 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(108,99,255,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(108,99,255,0.15);
+    border: 1px solid rgba(108,99,255,0.3);
+    color: var(--accent);
+    padding: 6px 16px; border-radius: 100px;
+    font-size: 13px; font-weight: 500;
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-size: clamp(32px, 6vw, 64px);
+    font-weight: 900; line-height: 1.1;
+    margin-bottom: 20px;
+  }
+  .hero h1 .highlight {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero p {
+    font-size: 18px; color: var(--text2);
+    max-width: 540px; margin: 0 auto 36px;
+    line-height: 1.7;
+  }
+  .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .stats-bar {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 24px 0;
+  }
+  .stats-inner {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 0; text-align: center;
+  }
+  .stat-item { padding: 8px 0; }
+  .stat-item:not(:last-child) { border-left: 1px solid var(--border); }
+  .stat-num { font-size: 28px; font-weight: 900; color: var(--accent); font-family: 'Space Mono', monospace; }
+  .stat-label { font-size: 13px; color: var(--text2); margin-top: 4px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .card:hover { border-color: rgba(108,99,255,0.4); }
+  .card-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .card-subtitle { font-size: 14px; color: var(--text2); }
+  .form-group { margin-bottom: 18px; }
+  .form-label { display: block; font-size: 14px; font-weight: 600; color: var(--text2); margin-bottom: 8px; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 15px;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(108,99,255,0.1);
+  }
+  .form-textarea { resize: vertical; min-height: 100px; }
+  .form-select option { background: var(--surface2); }
+  .tabs { display: flex; gap: 4px; background: var(--surface); border-radius: 12px; padding: 4px; margin-bottom: 24px; }
+  .tab {
+    flex: 1; padding: 10px; border-radius: 9px; border: none;
+    background: transparent; color: var(--text2);
+    font-family: 'Tajawal', sans-serif; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .tab.active { background: var(--accent); color: #fff; }
+  .badge {
+    display: inline-block; padding: 3px 10px; border-radius: 100px;
+    font-size: 12px; font-weight: 600;
+  }
+  .badge-purple { background: rgba(108,99,255,0.2); color: var(--accent); }
+  .badge-green { background: rgba(67,233,123,0.2); color: var(--accent3); }
+  .badge-red { background: rgba(255,100,132,0.2); color: var(--accent2); }
+  .badge-gold { background: rgba(255,215,0,0.2); color: var(--gold); }
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    width: 100%; max-width: 480px;
+    max-height: 90vh; overflow-y: auto;
+    animation: modalIn 0.25s ease;
+    position: relative;
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .modal-title { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+  .modal-subtitle { font-size: 14px; color: var(--text2); margin-bottom: 24px; }
+  .modal-close {
+    position: absolute; top: 16px; left: 16px;
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text2); width: 32px; height: 32px;
+    border-radius: 8px; cursor: pointer; font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .dashboard { padding: 40px 0; }
+  .dashboard-header { margin-bottom: 32px; }
+  .dashboard-header h2 { font-size: 28px; font-weight: 800; }
+  .dashboard-header p { color: var(--text2); margin-top: 6px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+  .skills-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .skill-tag {
+    background: rgba(108,99,255,0.12);
+    border: 1px solid rgba(108,99,255,0.25);
+    color: var(--accent);
+    padding: 4px 12px; border-radius: 100px;
+    font-size: 13px; font-weight: 500;
+  }
+  .passport {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    border: 1px solid rgba(108,99,255,0.3);
+    border-radius: 20px; padding: 28px;
+    position: relative; overflow: hidden;
+  }
+  .passport::after {
+    content: 'JOBOINT';
+    position: absolute; bottom: -20px; right: -10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 80px; font-weight: 700;
+    color: rgba(108,99,255,0.06);
+    pointer-events: none;
+  }
+  .passport-name { font-size: 22px; font-weight: 800; }
+  .passport-title { color: var(--text2); font-size: 14px; margin-top: 4px; }
+  .passport-score {
+    font-family: 'Space Mono', monospace;
+    font-size: 48px; font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+    margin: 16px 0 4px;
+  }
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    z-index: 999;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-size: 14px; font-weight: 600;
+    box-shadow: var(--shadow);
+    animation: toastIn 0.3s ease;
+  }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+  .toast.success { border-color: var(--accent3); color: var(--accent3); }
+  .toast.error { border-color: var(--accent2); color: var(--accent2); }
+  .job-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    transition: all 0.2s;
+  }
+  .job-card:hover { border-color: rgba(108,99,255,0.4); transform: translateY(-2px); }
+  .job-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .job-card-title { font-size: 17px; font-weight: 700; }
+  .job-card-company { font-size: 13px; color: var(--text2); margin-top: 3px; }
+  .job-card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; }
+  .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 40px auto;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .question-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .question-text { font-size: 16px; font-weight: 600; margin-bottom: 14px; line-height: 1.6; }
+  .option-btn {
+    width: 100%; text-align: right;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 16px; border-radius: 10px;
+    font-family: 'Tajawal', sans-serif; font-size: 14px;
+    cursor: pointer; transition: all 0.15s;
+    margin-bottom: 8px; display: block;
+  }
+  .option-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .option-btn.selected { border-color: var(--accent); background: rgba(108,99,255,0.12); color: var(--accent); }
+  .option-btn.correct { border-color: var(--accent3); background: rgba(67,233,123,0.12); color: var(--accent3); }
+  .option-btn.wrong { border-color: var(--accent2); background: rgba(255,100,132,0.12); color: var(--accent2); }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+  .empty { text-align: center; padding: 60px 20px; color: var(--text3); }
+  .empty-icon { font-size: 48px; margin-bottom: 16px; }
+  .empty p { font-size: 16px; }
+  .alert {
+    padding: 14px 18px; border-radius: 10px;
+    font-size: 14px; margin-bottom: 20px;
+  }
+  .alert-error { background: rgba(255,100,132,0.1); border: 1px solid rgba(255,100,132,0.3); color: var(--accent2); }
+  .alert-success { background: rgba(67,233,123,0.1); border: 1px solid rgba(67,233,123,0.3); color: var(--accent3); }
+  .progress-bar { background: var(--border); border-radius: 100px; height: 8px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 100px; transition: width 0.5s ease; }
+  @media (max-width: 600px) {
+    .hero { padding: 50px 0 40px; }
+    .stats-inner { grid-template-columns: repeat(3,1fr); }
+    .modal { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+// ============================
+// DEEPSEEK CONFIGURATION (key provided by user)
+// ============================
+const DEEPSEEK_API_KEY = 'sk-145d8a758b9c4726b437bc2ff7435f27';
+const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
+
+// ============================
+// SUPABASE CONFIG
+// ============================
+const SUPABASE_URL = 'https://xjitsmbcngacmmzbwwpa.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhqaXRzbWJjbmdhY21temJ3d3BhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMjcxOTUsImV4cCI6MjA5NDgwMzE5NX0.RgxQ8V2ZvhmrfdF43wgUca99ARz4pNy8a0UVRquxSy0';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ============================
+// TRANSLATIONS
+// ============================
+const T = {
+  ar: {
+    brand: 'نقطة التوظيف',
+    tagline: 'المنصة الذكية للتوظيف',
+    heroTitle: 'وظّف بذكاء، احترف بجواز مهاري',
+    heroSub: 'منصة متكاملة تربط المرشحين بأصحاب العمل عبر اختبارات مهارية ذكية',
+    forCandidate: 'أنا مرشح',
+    forEmployer: 'أنا صاحب عمل',
+    login: 'تسجيل الدخول',
+    register: 'إنشاء حساب',
+    logout: 'تسجيل الخروج',
+    email: 'البريد الإلكتروني',
+    password: 'كلمة المرور',
+    fullName: 'الاسم الكامل',
+    role: 'نوع الحساب',
+    candidate: 'مرشح للتوظيف',
+    employer: 'صاحب عمل',
+    dashboard: 'لوحة التحكم',
+    myPassport: 'جواز مهاراتي',
+    jobs: 'الوظائف',
+    postJob: 'نشر وظيفة',
+    myJobs: 'وظائفي',
+    applications: 'الطلبات',
+    assessments: 'الاختبارات',
+    startAssessment: 'ابدأ اختبار',
+    skillName: 'اسم المهارة',
+    generate: 'توليد الاختبار',
+    generating: 'جارٍ التوليد...',
+    submit: 'إرسال',
+    score: 'النتيجة',
+    passed: 'ناجح ✓',
+    failed: 'لم يجتز ✗',
+    jobTitle: 'المسمى الوظيفي',
+    description: 'الوصف',
+    location: 'الموقع',
+    jobType: 'نوع الوظيفة',
+    fullTime: 'دوام كامل',
+    partTime: 'دوام جزئي',
+    remote: 'عن بُعد',
+    freelance: 'مستقل',
+    requiredSkills: 'المهارات المطلوبة (مفصولة بفاصلة)',
+    apply: 'تقديم طلب',
+    applied: 'تم التقديم',
+    pending: 'قيد المراجعة',
+    accepted: 'مقبول',
+    rejected: 'مرفوض',
+    noJobs: 'لا توجد وظائف حالياً',
+    noAssessments: 'لم تجرِ أي اختبارات بعد',
+    companyName: 'اسم الشركة',
+    industry: 'القطاع',
+    website: 'الموقع الإلكتروني',
+    bio: 'نبذة شخصية',
+    title: 'المسمى الوظيفي الحالي',
+    experienceYears: 'سنوات الخبرة',
+    skills: 'مهاراتك',
+    saveProfile: 'حفظ الملف الشخصي',
+    profile: 'الملف الشخصي',
+    welcome: 'مرحباً',
+    totalScore: 'متوسط النتائج',
+    completedTests: 'اختبارات مكتملة',
+    appliedJobs: 'وظائف مقدّم عليها',
+    postedJobs: 'وظائف منشورة',
+    viewApplications: 'عرض الطلبات',
+    noApplications: 'لا توجد طلبات بعد',
+    lang: 'EN',
+    next: 'التالي',
+    prev: 'السابق',
+    finish: 'إنهاء الاختبار',
+    question: 'سؤال',
+    of: 'من',
+    alreadyApplied: 'تم التقديم مسبقاً',
+    deleteJob: 'حذف',
+    active: 'نشطة',
+    inactive: 'غير نشطة',
+    profileSaved: 'تم حفظ الملف الشخصي',
+    jobPosted: 'تم نشر الوظيفة',
+    applicationSent: 'تم إرسال طلبك',
+    error: 'حدث خطأ',
+    fillFields: 'يرجى ملء جميع الحقول',
+    passportTheme: 'مظهر الجواز',
+  },
+  en: {
+    brand: 'Joboint',
+    tagline: 'Smart Hiring Platform',
+    heroTitle: 'Hire Smart, Shine with Your Skill Passport',
+    heroSub: 'Complete platform connecting candidates with employers through skill assessments',
+    forCandidate: "I'm a Candidate",
+    forEmployer: "I'm an Employer",
+    login: 'Sign In',
+    register: 'Sign Up',
+    logout: 'Sign Out',
+    email: 'Email',
+    password: 'Password',
+    fullName: 'Full Name',
+    role: 'Account Type',
+    candidate: 'Job Candidate',
+    employer: 'Employer',
+    dashboard: 'Dashboard',
+    myPassport: 'My Skill Passport',
+    jobs: 'Jobs',
+    postJob: 'Post a Job',
+    myJobs: 'My Jobs',
+    applications: 'Applications',
+    assessments: 'Assessments',
+    startAssessment: 'Start Assessment',
+    skillName: 'Skill Name',
+    generate: 'Generate Assessment',
+    generating: 'Generating...',
+    submit: 'Submit',
+    score: 'Score',
+    passed: 'Passed ✓',
+    failed: 'Failed ✗',
+    jobTitle: 'Job Title',
+    description: 'Description',
+    location: 'Location',
+    jobType: 'Job Type',
+    fullTime: 'Full Time',
+    partTime: 'Part Time',
+    remote: 'Remote',
+    freelance: 'Freelance',
+    requiredSkills: 'Required Skills (comma separated)',
+    apply: 'Apply Now',
+    applied: 'Applied',
+    pending: 'Pending',
+    accepted: 'Accepted',
+    rejected: 'Rejected',
+    noJobs: 'No jobs available',
+    noAssessments: 'No assessments yet',
+    companyName: 'Company Name',
+    industry: 'Industry',
+    website: 'Website',
+    bio: 'Bio',
+    title: 'Current Job Title',
+    experienceYears: 'Years of Experience',
+    skills: 'Your Skills',
+    saveProfile: 'Save Profile',
+    profile: 'Profile',
+    welcome: 'Welcome',
+    totalScore: 'Average Score',
+    completedTests: 'Completed Tests',
+    appliedJobs: 'Applied Jobs',
+    postedJobs: 'Posted Jobs',
+    viewApplications: 'View Applications',
+    noApplications: 'No applications yet',
+    lang: 'عربي',
+    next: 'Next',
+    prev: 'Previous',
+    finish: 'Finish Test',
+    question: 'Question',
+    of: 'of',
+    alreadyApplied: 'Already Applied',
+    deleteJob: 'Delete',
+    active: 'Active',
+    inactive: 'Inactive',
+    profileSaved: 'Profile saved',
+    jobPosted: 'Job posted',
+    applicationSent: 'Application sent',
+    error: 'An error occurred',
+    fillFields: 'Please fill all fields',
+    passportTheme: 'Passport Theme',
+  }
+};
+
+// ============================
+// DEEPSEEK QUESTION GENERATOR
+// ============================
+async function generateQuestionsWithDeepSeek(skill, langCode) {
+  const prompt = langCode === 'ar'
+    ? `أنشئ اختبارًا من 5 أسئلة متعددة الاختيار لقياس مهارة "${skill}". يجب أن تكون الأسئلة باللغة العربية. أجب فقط بـ JSON بهذا الشكل الدقيق بدون أي نص إضافي: {"questions":[{"q":"السؤال","options":["خيار1","خيار2","خيار3","خيار4"],"correct":0}]} حيث correct هو رقم الفهرس (0-3) للإجابة الصحيحة.`
+    : `Create a 5-question multiple-choice test for the skill "${skill}". Respond only with a JSON object in this exact format, no extra text: {"questions":[{"q":"Question text","options":["Option1","Option2","Option3","Option4"],"correct":0}]} where correct is the index (0-3) of the right answer.`;
+
+  const response = await fetch(DEEPSEEK_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: 'deepseek-chat',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+      max_tokens: 1500
+    })
+  });
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`DeepSeek API error: ${response.status} ${errText}`);
+  }
+  const data = await response.json();
+  const content = data.choices[0].message.content;
+  let cleaned = content.replace(/```json\s*|\s*```/g, '').trim();
+  const parsed = JSON.parse(cleaned);
+  if (!parsed.questions || !Array.isArray(parsed.questions)) throw new Error('Invalid response format');
+  return parsed.questions;
+}
+
+// ============================
+// REACT HELPERS
+// ============================
+const AuthCtx = React.createContext(null);
+const LangCtx = React.createContext('ar');
+const h = React.createElement;
+
+// ============================
+// TOAST
+// ============================
+function Toast({ msg, type, onDone }) {
+  React.useEffect(() => {
+    const t = setTimeout(onDone, 3000);
+    return () => clearTimeout(t);
+  }, []);
+  return h('div', { className: `toast ${type}` }, msg);
+}
+
+// ============================
+// MODAL
+// ============================
+function Modal({ onClose, children }) {
+  return h('div', { className: 'modal-overlay', onClick: (e) => e.target === e.currentTarget && onClose() },
+    h('div', { className: 'modal' },
+      h('button', { className: 'modal-close', onClick: onClose }, '✕'),
+      children
+    )
+  );
+}
+
+// ============================
+// AUTH MODAL
+// ============================
+function AuthModal({ onClose, defaultTab }) {
+  const lang = React.useContext(LangCtx);
+  const t = T[lang];
+  const [tab, setTab] = React.useState(defaultTab || 'login');
+  const [form, setForm] = React.useState({ email:'', password:'', fullName:'', role:'candidate' });
+  const [loading, setLoading] = React.useState(false);
+  const [err, setErr] = React.useState('');
+
+  const handleLogin = async () => {
+    setLoading(true); setErr('');
+    const { error } = await sb.auth.signInWithPassword({ email: form.email, password: form.password });
+    setLoading(false);
+    if (error) setErr(error.message);
+    else onClose();
+  };
+
+  const handleRegister = async () => {
+    if (!form.email || !form.password || !form.fullName) { setErr(t.fillFields); return; }
+    setLoading(true); setErr('');
+    const { data, error } = await sb.auth.signUp({
+      email: form.email,
+      password: form.password,
+      options: { data: { full_name: form.fullName, role: form.role } }
+    });
+    if (error) { setErr(error.message); setLoading(false); return; }
+    if (data.user) {
+      await sb.from('profiles').update({ role: form.role, full_name: form.fullName }).eq('id', data.user.id);
+      if (form.role === 'employer') {
+        await sb.from('employers').insert({ user_id: data.user.id, company_name: form.fullName });
+      } else {
+        await sb.from('candidates').insert({ user_id: data.user.id });
+      }
+    }
+    setLoading(false);
+    if (!error) onClose();
+  };
+
+  const f = (k) => (v) => setForm(p => ({ ...p, [k]: v }));
+
+  return h(Modal, { onClose },
+    h('div', { className: 'modal-title' }, tab === 'login' ? t.login : t.register),
+    h('div', { className: 'modal-subtitle' }, t.brand),
+    h('div', { className: 'tabs', style: { marginBottom: 20 } },
+      h('button', { className: `tab ${tab==='login' ? 'active' : ''}`, onClick: () => setTab('login') }, t.login),
+      h('button', { className: `tab ${tab==='register' ? 'active' : ''}`, onClick: () => setTab('register') }, t.register)
+    ),
+    err && h('div', { className: 'alert alert-error' }, err),
+    tab === 'register' && h(React.Fragment, null,
+      h('div', { className: 'form-group' },
+        h('label', { className: 'form-label' }, t.fullName),
+        h('input', { className: 'form-input', value: form.fullName, onChange: e => f('fullName')(e.target.value) })
+      ),
+      h('div', { className: 'form-group' },
+        h('label', { className: 'form-label' }, t.role),
+        h('select', { className: 'form-select', value: form.role, onChange: e => f('role')(e.target.value) },
+          h('option', { value: 'candidate' }, t.candidate),
+          h('option', { value: 'employer' }, t.employer)
+        )
+      )
+    ),
+    h('div', { className: 'form-group' },
+      h('label', { className: 'form-label' }, t.email),
+      h('input', { className: 'form-input', type: 'email', value: form.email, onChange: e => f('email')(e.target.value) })
+    ),
+    h('div', { className: 'form-group' },
+      h('label', { className: 'form-label' }, t.password),
+      h('input', { className: 'form-input', type: 'password', value: form.password, onChange: e => f('password')(e.target.value),
+        onKeyDown: e => e.key==='Enter' && (tab==='login' ? handleLogin() : handleRegister()) })
+    ),
+    h('button', { className: 'btn btn-primary', style: { width: '100%' }, disabled: loading, onClick: tab==='login' ? handleLogin : handleRegister },
+      loading ? '...' : (tab==='login' ? t.login : t.register)
+    )
+  );
+}
+
+// ============================
+// NAVBAR
+// ============================
+function Navbar({ user, profile, onAuth, onLogout, lang, setLang, setPage, page }) {
+  const t = T[lang];
+  return h('nav', { className: 'navbar' },
+    h('div', { className: 'container' },
+      h('div', { className: 'navbar-inner' },
+        h('div', { className: 'logo', onClick: () => setPage('home') }, 'Job', h('span', null, 'oint')),
+        h('div', { className: 'nav-actions' },
+          h('button', { className: 'lang-toggle', onClick: () => setLang(l => l==='ar' ? 'en' : 'ar') }, t.lang),
+          user ? [
+            profile && h('button', { key: 'dashboard', className: 'btn btn-outline btn-sm', onClick: () => setPage('dashboard') }, t.dashboard),
+            h('button', { key: 'logout', className: 'btn btn-outline btn-sm', onClick: onLogout }, t.logout)
+          ] : [
+            h('button', { key: 'login', className: 'btn btn-outline btn-sm', onClick: () => onAuth('login') }, t.login),
+            h('button', { key: 'register', className: 'btn btn-primary btn-sm', onClick: () => onAuth('register') }, t.register)
+          ]
+        )
+      )
+    )
+  );
+}
+
+// ============================
+// HERO
+// ============================
+function Hero({ onAuth, lang }) {
+  const t = T[lang];
+  return h('section', { className: 'hero' },
+    h('div', { className: 'container' },
+      h('div', { className: 'hero-badge' }, '✦ ' + t.tagline),
+      h('h1', null,
+        t.heroTitle.split('،').map((part, i, a) =>
+          i === 0 ? h('span', { key: i }, part + '،') : h('span', { key: i, className: 'highlight' }, ' ' + part)
+        )
+      ),
+      h('p', null, t.heroSub),
+      h('div', { className: 'hero-actions' },
+        h('button', { className: 'btn btn-primary', onClick: () => onAuth('register', 'candidate') }, '👤 ' + t.forCandidate),
+        h('button', { className: 'btn btn-outline', onClick: () => onAuth('register', 'employer') }, '🏢 ' + t.forEmployer)
+      )
+    )
+  );
+}
+
+// ============================
+// STATS BAR
+// ============================
+function StatsBar({ stats, lang }) {
+  const t = T[lang];
+  return h('div', { className: 'stats-bar' },
+    h('div', { className: 'container' },
+      h('div', { className: 'stats-inner' },
+        h('div', { className: 'stat-item' }, h('div', { className: 'stat-num' }, stats.candidates + '+'), h('div', { className: 'stat-label' }, lang==='ar' ? 'مرشح مسجّل' : 'Registered Candidates')),
+        h('div', { className: 'stat-item' }, h('div', { className: 'stat-num' }, stats.jobs + '+'), h('div', { className: 'stat-label' }, lang==='ar' ? 'وظيفة منشورة' : 'Posted Jobs')),
+        h('div', { className: 'stat-item' }, h('div', { className: 'stat-num' }, stats.assessments + '+'), h('div', { className: 'stat-label' }, lang==='ar' ? 'اختبار مكتمل' : 'Completed Assessments'))
+      )
+    )
+  );
+}
+
+// ============================
+// SKILL PASSPORT
+// ============================
+function SkillPassport({ candidate, assessments, lang }) {
+  const t = T[lang];
+  const themes = {
+    classic: { bg: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)', accent: '#6c63ff' },
+    gold: { bg: 'linear-gradient(135deg, #1a1200 0%, #2d2000 50%, #3d2d00 100%)', accent: '#ffd700' },
+    green: { bg: 'linear-gradient(135deg, #001a0f 0%, #002d1a 50%, #003d22 100%)', accent: '#43e97b' },
+    dark: { bg: 'linear-gradient(135deg, #0a0a0a 0%, #111 50%, #1a1a1a 100%)', accent: '#ff6584' },
+  };
+  const avgScore = assessments.length > 0 ? Math.round(assessments.reduce((s,a)=>s+(a.score||0),0)/assessments.length) : 0;
+  const theme = themes[candidate?.passport_theme || 'classic'];
+  return h('div', { className: 'passport', style: { background: theme.bg } },
+    h('div', { style: { display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:20 } },
+      h('div', null,
+        h('div', { style: { fontSize:11, color:'rgba(255,255,255,0.4)', fontFamily:'Space Mono', marginBottom:4 } }, 'JOBOINT SKILL PASSPORT'),
+        h('div', { className: 'passport-name' }, candidate?.profiles?.full_name || '—'),
+        h('div', { className: 'passport-title' }, candidate?.title || t.candidate)
+      ),
+      h('div', { style: { textAlign:'center' } },
+        h('div', { className: 'passport-score', style: { color: theme.accent } }, avgScore + '%'),
+        h('div', { style: { fontSize:11, color:'rgba(255,255,255,0.5)' } }, t.totalScore)
+      )
+    ),
+    candidate?.skills?.length > 0 && h('div', { className: 'skills-wrap' }, candidate.skills.slice(0,6).map(s => h('span', { key: s, className: 'skill-tag', style: { borderColor: theme.accent+'40', color: theme.accent } }, s))),
+    h('div', { style: { marginTop:20, display:'flex', gap:24 } },
+      h('div', null, h('div', { style: { fontSize:11, color:'rgba(255,255,255,0.4)' } }, 'TESTS'), h('div', { style: { fontSize:22, fontWeight:700, fontFamily:'Space Mono', color:theme.accent } }, assessments.length)),
+      h('div', null, h('div', { style: { fontSize:11, color:'rgba(255,255,255,0.4)' } }, 'PASSED'), h('div', { style: { fontSize:22, fontWeight:700, fontFamily:'Space Mono', color:'#43e97b' } }, assessments.filter(a=>a.passed).length)),
+      h('div', null, h('div', { style: { fontSize:11, color:'rgba(255,255,255,0.4)' } }, 'EXP'), h('div', { style: { fontSize:22, fontWeight:700, fontFamily:'Space Mono', color:'rgba(255,255,255,0.6)' } }, (candidate?.experience_years || 0) + 'y'))
+    )
+  );
+}
+
+// ============================
+// ASSESSMENT RUNNER (DeepSeek)
+// ============================
+function AssessmentRunner({ candidateId, onDone, lang }) {
+  const t = T[lang];
+  const [skill, setSkill] = React.useState('');
+  const [questions, setQuestions] = React.useState(null);
+  const [answers, setAnswers] = React.useState({});
+  const [current, setCurrent] = React.useState(0);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState('');
+  const [result, setResult] = React.useState(null);
+
+  const generateAssessment = async () => {
+    if (!skill.trim()) return;
+    setLoading(true);
+    setError('');
+    try {
+      const generated = await generateQuestionsWithDeepSeek(skill, lang);
+      setQuestions(generated);
+      setAnswers({});
+      setCurrent(0);
+      setResult(null);
+    } catch (err) {
+      console.error(err);
+      setError(err.message || t.error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const submitAssessment = async () => {
+    const correct = questions.filter((q,i)=>answers[i]===q.correct).length;
+    const score = Math.round((correct/questions.length)*100);
+    const passed = score >= 60;
+    setResult({ score, passed, correct, total: questions.length });
+    await sb.from('assessments').insert({
+      candidate_id: candidateId,
+      skill,
+      questions,
+      answers: Object.values(answers),
+      score,
+      passed
+    });
+    if (onDone) onDone();
+  };
+
+  if (result) return h('div', { style: { textAlign:'center', padding:'20px 0' } },
+    h('div', { style: { fontSize:64, marginBottom:8 } }, result.passed ? '🏆' : '📚'),
+    h('div', { style: { fontSize:48, fontWeight:900, fontFamily:'Space Mono', color: result.passed ? 'var(--accent3)' : 'var(--accent2)' } }, result.score + '%'),
+    h('div', { style: { marginTop:8 } }, h('span', { className: `badge ${result.passed ? 'badge-green' : 'badge-red'}`, style: { fontSize:16, padding:'6px 20px' } }, result.passed ? t.passed : t.failed)),
+    h('p', { style: { color:'var(--text2)', marginTop:16 } }, result.correct + '/' + result.total + ' ' + (lang==='ar' ? 'إجابات صحيحة' : 'correct answers')),
+    h('button', { className: 'btn btn-outline', style: { marginTop:24 }, onClick: () => { setQuestions(null); setSkill(''); setResult(null); setError(''); } }, lang==='ar' ? 'اختبار جديد' : 'New Assessment')
+  );
+
+  if (!questions) return h('div', null,
+    error && h('div', { className: 'alert alert-error' }, error),
+    h('div', { className: 'form-group' },
+      h('label', { className: 'form-label' }, t.skillName),
+      h('input', { className: 'form-input', value: skill, onChange: e => setSkill(e.target.value),
+        placeholder: lang==='ar' ? 'مثال: JavaScript، تحليل البيانات' : 'e.g. JavaScript, Data Analysis',
+        onKeyDown: e => e.key==='Enter' && generateAssessment() })
+    ),
+    h('button', { className: 'btn btn-primary', style: { width:'100%' }, disabled: loading || !skill.trim(), onClick: generateAssessment },
+      loading ? t.generating : t.generate)
+  );
+
+  const q = questions[current];
+  return h('div', null,
+    h('div', { style: { display:'flex', justifyContent:'space-between', marginBottom:16, alignItems:'center' } },
+      h('span', { style: { color:'var(--text2)', fontSize:14 } }, t.question + ' ' + (current+1) + ' ' + t.of + ' ' + questions.length),
+      h('span', { className: 'badge badge-purple' }, skill)
+    ),
+    h('div', { className: 'progress-bar', style: { marginBottom:20 } }, h('div', { className: 'progress-fill', style: { width: `${((current+1)/questions.length)*100}%` } })),
+    h('div', { className: 'question-card' },
+      h('div', { className: 'question-text' }, q.q),
+      q.options.map((opt,i) => {
+        let cls = 'option-btn';
+        if (answers[current] !== undefined) {
+          if (i === q.correct) cls += ' correct';
+          else if (answers[current]===i) cls += ' wrong';
+        } else if (answers[current]===i) cls += ' selected';
+        return h('button', { key: i, className: cls, onClick: () => { if(answers[current]===undefined) setAnswers(p=>({...p,[current]:i})); } }, opt);
+      })
+    ),
+    h('div', { style: { display:'flex', gap:10, justifyContent:'space-between' } },
+      h('button', { className: 'btn btn-outline', disabled: current===0, onClick: () => setCurrent(p=>p-1) }, t.prev),
+      current < questions.length-1
+        ? h('button', { className: 'btn btn-primary', disabled: answers[current]===undefined, onClick: () => setCurrent(p=>p+1) }, t.next)
+        : h('button', { className: 'btn btn-success', disabled: Object.keys(answers).length < questions.length, onClick: submitAssessment }, t.finish)
+    )
+  );
+}
+
+// ============================
+// JOBS LIST
+// ============================
+function JobsList({ user, profile, candidate, lang, showToast }) {
+  const t = T[lang];
+  const [jobs, setJobs] = React.useState([]);
+  const [applications, setApplications] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    loadJobs();
+    if (candidate) loadApplications();
+  }, []);
+
+  const loadJobs = async () => {
+    const { data } = await sb.from('jobs').select('*, employers(company_name)').eq('is_active', true).order('created_at', {ascending:false});
+    setJobs(data||[]);
+    setLoading(false);
+  };
+  const loadApplications = async () => {
+    const { data } = await sb.from('applications').select('job_id').eq('candidate_id', candidate.id);
+    setApplications((data||[]).map(a=>a.job_id));
+  };
+  const applyJob = async (jobId) => {
+    if (!candidate) return;
+    await sb.from('applications').insert({ candidate_id: candidate.id, job_id: jobId });
+    setApplications(p=>[...p, jobId]);
+    showToast(t.applicationSent, 'success');
+  };
+  const typeLabel = (type) => ({ full_time:t.fullTime, part_time:t.partTime, remote:t.remote, freelance:t.freelance }[type]||type);
+
+  if (loading) return h('div', { className: 'spinner' });
+  if (jobs.length === 0) return h('div', { className: 'empty' }, h('div', { className: 'empty-icon' }, '💼'), h('p', null, t.noJobs));
+  return h('div', { className: 'grid-2' }, jobs.map(job => h('div', { key: job.id, className: 'job-card' },
+    h('div', { className: 'job-card-top' },
+      h('div', null, h('div', { className: 'job-card-title' }, job.title), h('div', { className: 'job-card-company' }, '🏢 ' + (job.employers?.company_name || ''))),
+      h('span', { className: 'badge badge-purple' }, typeLabel(job.job_type))
+    ),
+    job.description && h('p', { style: { fontSize:13, color:'var(--text2)', lineHeight:1.6, marginBottom:12 } }, job.description.slice(0,120) + (job.description.length>120 ? '...' : '')),
+    job.location && h('div', { style: { fontSize:13, color:'var(--text3)', marginBottom:8 } }, '📍 ' + job.location),
+    job.required_skills?.length > 0 && h('div', { className: 'skills-wrap' }, job.required_skills.map(s => h('span', { key: s, className: 'skill-tag' }, s))),
+    h('div', { className: 'job-card-footer' },
+      h('span', { style: { fontSize:12, color:'var(--text3)' } }, new Date(job.created_at).toLocaleDateString(lang==='ar' ? 'ar-SA' : 'en-US')),
+      profile?.role === 'candidate' && (applications.includes(job.id)
+        ? h('span', { className: 'badge badge-green' }, t.applied)
+        : h('button', { className: 'btn btn-primary btn-sm', onClick: () => applyJob(job.id) }, t.apply))
+    )
+  )));
+}
+
+// ============================
+// POST JOB FORM
+// ============================
+function PostJobForm({ employer, lang, showToast, onPosted }) {
+  const t = T[lang];
+  const [form, setForm] = React.useState({ title:'', description:'', location:'', job_type:'full_time', required_skills:'' });
+  const [loading, setLoading] = React.useState(false);
+  const submit = async () => {
+    if (!form.title) { showToast(t.fillFields, 'error'); return; }
+    setLoading(true);
+    const skills = form.required_skills.split(',').map(s=>s.trim()).filter(Boolean);
+    await sb.from('jobs').insert({ employer_id: employer.id, title: form.title, description: form.description, location: form.location, job_type: form.job_type, required_skills: skills });
+    setLoading(false);
+    showToast(t.jobPosted, 'success');
+    setForm({ title:'', description:'', location:'', job_type:'full_time', required_skills:'' });
+    if (onPosted) onPosted();
+  };
+  const f = k => v => setForm(p=>({...p,[k]:v}));
+  return h('div', { className: 'card' },
+    h('div', { className: 'card-title' }, t.postJob),
+    h('hr', { className: 'divider' }),
+    h('div', { className: 'form-group' }, h('label', { className: 'form-label' }, t.jobTitle), h('input', { className: 'form-input', value: form.title, onChange: e=>f('title')(e.target.value) })),
+    h('div', { className: 'form-group' }, h('label', { className: 'form-label' }, t.description), h('textarea', { className: 'form-textarea', value: form.description, onChange: e=>f('description')(e.target.value) })),
+    h('div', { className: 'grid-2', style: { marginBottom:18 } },
+      h('div', { className: 'form-group', style: { marginBottom:0 } }, h('label', { className: 'form-label' }, t.location), h('input', { className: 'form-input', value: form.location, onChange: e=>f('location')(e.target.value) })),
+      h('div', { className: 'form-group', style: { marginBottom:0 } }, h('label', { className: 'form-label' }, t.jobType), h('select', { className: 'form-select', value: form.job_type, onChange: e=>f('job_type')(e.target.value) },
+        h('option', { value: 'full_time' }, t.fullTime), h('option', { value: 'part_time' }, t.partTime), h('option', { value: 'remote' }, t.remote), h('option', { value: 'freelance' }, t.freelance)))
+    ),
+    h('div', { className: 'form-group' }, h('label', { className: 'form-label' }, t.requiredSkills), h('input', { className: 'form-input', value: form.required_skills, onChange: e=>f('required_skills')(e.target.value) })),
+    h('button', { className: 'btn btn-primary', style: { width:'100%' }, disabled: loading, onClick: submit }, loading ? '...' : t.postJob)
+  );
+}
+
+// ============================
+// PROFILE EDITOR
+// ============================
+function ProfileEditor({ profile, candidate, employer, lang, showToast, onSaved }) {
+  const t = T[lang];
+  const [form, setForm] = React.useState(
+    profile.role === 'candidate'
+      ? { title: candidate?.title||'', bio: candidate?.bio||'', skills: (candidate?.skills||[]).join(', '), experience_years: candidate?.experience_years||0, passport_theme: candidate?.passport_theme||'classic' }
+      : { company_name: employer?.company_name||'', industry: employer?.industry||'', website: employer?.website||'' }
+  );
+  const [loading, setLoading] = React.useState(false);
+  const f = k => v => setForm(p=>({...p,[k]:v}));
+  const save = async () => {
+    setLoading(true);
+    if (profile.role === 'candidate') {
+      const skills = form.skills.split(',').map(s=>s.trim()).filter(Boolean);
+      await sb.from('candidates').update({ title: form.title, bio: form.bio, skills, experience_years: parseInt(form.experience_years)||0, passport_theme: form.passport_theme }).eq('user_id', profile.id);
+    } else {
+      await sb.from('employers').update({ company_name: form.company_name, industry: form.industry, website: form.website }).eq('user_id', profile.id);
+    }
+    setLoading(false);
+    showToast(t.profileSaved, 'success');
+    if (onSaved) onSaved();
+  };
+  return h('div', { className: 'card' },
+    h('div', { className: 'card-title' }, t.profile),
+    h('hr', { className: 'divider' }),
+    profile.role === 'candidate' ? [
+      h('div', { key: 'title', className: 'form-group' }, h('label', { className: 'form-label' }, t.title), h('input', { className: 'form-input', value: form.title, onChange: e=>f('title')(e.target.value) })),
+      h('div', { key: 'bio', className: 'form-group' }, h('label', { className: 'form-label' }, t.bio), h('textarea', { className: 'form-textarea', value: form.bio, onChange: e=>f('bio')(e.target.value) })),
+      h('div', { key: 'skills', className: 'form-group' }, h('label', { className: 'form-label' }, t.skills), h('input', { className: 'form-input', value: form.skills, onChange: e=>f('skills')(e.target.value), placeholder: "JavaScript, React, Python" })),
+      h('div', { key: 'exp', className: 'form-group' }, h('label', { className: 'form-label' }, t.experienceYears), h('input', { className: 'form-input', type: 'number', value: form.experience_years, onChange: e=>f('experience_years')(e.target.value) })),
+      h('div', { key: 'theme', className: 'form-group' }, h('label', { className: 'form-label' }, t.passportTheme), h('select', { className: 'form-select', value: form.passport_theme, onChange: e=>f('passport_theme')(e.target.value) }, ['classic','gold','green','dark'].map(th => h('option', { key: th, value: th }, th.charAt(0).toUpperCase()+th.slice(1)))))
+    ] : [
+      h('div', { key: 'company', className: 'form-group' }, h('label', { className: 'form-label' }, t.companyName), h('input', { className: 'form-input', value: form.company_name, onChange: e=>f('company_name')(e.target.value) })),
+      h('div', { key: 'industry', className: 'form-group' }, h('label', { className: 'form-label' }, t.industry), h('input', { className: 'form-input', value: form.industry, onChange: e=>f('industry')(e.target.value) })),
+      h('div', { key: 'website', className: 'form-group' }, h('label', { className: 'form-label' }, t.website), h('input', { className: 'form-input', value: form.website, onChange: e=>f('website')(e.target.value) }))
+    ],
+    h('button', { className: 'btn btn-primary', style: { width:'100%' }, disabled: loading, onClick: save }, loading ? '...' : t.saveProfile)
+  );
+}
+
+// ============================
+// CANDIDATE DASHBOARD
+// ============================
+function CandidateDashboard({ profile, candidate, lang, showToast, refreshData }) {
+  const t = T[lang];
+  const [tab, setTab] = React.useState('passport');
+  const [assessments, setAssessments] = React.useState([]);
+  const [applications, setApplications] = React.useState([]);
+  React.useEffect(() => { if(candidate) loadData(); }, [candidate]);
+  const loadData = async () => {
+    const [{ data: ass }, { data: apps }] = await Promise.all([
+      sb.from('assessments').select('*').eq('candidate_id', candidate.id).order('completed_at',{ascending:false}),
+      sb.from('applications').select('*, jobs(title, employers(company_name))').eq('candidate_id', candidate.id).order('applied_at',{ascending:false})
+    ]);
+    setAssessments(ass||[]);
+    setApplications(apps||[]);
+  };
+  if (!candidate) return h('div', { className: 'spinner' });
+  const statusBadge = s => ({ pending: h('span', { className: 'badge badge-purple' }, t.pending), accepted: h('span', { className: 'badge badge-green' }, t.accepted), rejected: h('span', { className: 'badge badge-red' }, t.rejected) }[s] || h('span', { className: 'badge badge-purple' }, t.pending));
+  return h('div', { className: 'dashboard' },
+    h('div', { className: 'container' },
+      h('div', { className: 'dashboard-header' }, h('h2', null, '👋 ' + t.welcome + '، ' + profile.full_name), h('p', { style: { color:'var(--text2)' } }, t.candidate)),
+      h('div', { className: 'grid-3', style: { marginBottom:28 } }, [
+        { label:t.completedTests, val:assessments.length, icon:'🧪' },
+        { label:t.appliedJobs, val:applications.length, icon:'📨' },
+        { label:t.totalScore, val:assessments.length ? Math.round(assessments.reduce((s,a)=>s+(a.score||0),0)/assessments.length)+'%' : '—', icon:'📊' }
+      ].map(s => h('div', { key: s.label, className: 'card', style: { textAlign:'center' } }, h('div', { style: { fontSize:28, marginBottom:8 } }, s.icon), h('div', { style: { fontSize:28, fontWeight:900, fontFamily:'Space Mono', color:'var(--accent)' } }, s.val), h('div', { style: { fontSize:13, color:'var(--text2)', marginTop:4 } }, s.label)))),
+      h('div', { className: 'tabs' }, [['passport',t.myPassport],['assessment',t.startAssessment],['jobs',t.jobs],['applications',t.applications],['profile',t.profile]].map(([k,v]) => h('button', { key: k, className: `tab ${tab===k ? 'active' : ''}`, onClick: () => setTab(k) }, v))),
+      tab === 'passport' && h('div', { style: { maxWidth:480 } }, h(SkillPassport, { candidate: { ...candidate, profiles:profile }, assessments, lang })),
+      tab === 'assessment' && h('div', { className: 'card', style: { maxWidth:560 } }, h(AssessmentRunner, { candidateId: candidate.id, onDone: loadData, lang })),
+      tab === 'jobs' && h(JobsList, { user: null, profile, candidate, lang, showToast }),
+      tab === 'applications' && (applications.length === 0 ? h('div', { className: 'empty' }, h('div', { className: 'empty-icon' }, '📭'), h('p', null, t.noApplications)) : h('div', { className: 'grid-2' }, applications.map(app => h('div', { key: app.id, className: 'card' }, h('div', { className: 'card-title' }, app.jobs?.title), h('div', { className: 'card-subtitle' }, '🏢 ' + (app.jobs?.employers?.company_name || '')), h('div', { style: { marginTop:12 } }, statusBadge(app.status)), h('div', { style: { fontSize:12, color:'var(--text3)', marginTop:8 } }, new Date(app.applied_at).toLocaleDateString(lang==='ar'?'ar-SA':'en-US')))))),
+      tab === 'profile' && h('div', { style: { maxWidth:560 } }, h(ProfileEditor, { profile, candidate, lang, showToast, onSaved: refreshData }))
+    )
+  );
+}
+
+// ============================
+// EMPLOYER DASHBOARD
+// ============================
+function EmployerDashboard({ profile, employer, lang, showToast, refreshData }) {
+  const t = T[lang];
+  const [tab, setTab] = React.useState('jobs');
+  const [jobs, setJobs] = React.useState([]);
+  const [selectedJob, setSelectedJob] = React.useState(null);
+  const [applications, setApplications] = React.useState([]);
+  React.useEffect(() => { if(employer) loadJobs(); }, [employer]);
+  const loadJobs = async () => {
+    const { data } = await sb.from('jobs').select('*, applications(count)').eq('employer_id', employer.id).order('created_at',{ascending:false});
+    setJobs(data||[]);
+  };
+  const loadApplications = async (jobId) => {
+    const { data } = await sb.from('applications').select('*, candidates(title, skills, experience_years, profiles(full_name, email))').eq('job_id', jobId);
+    setApplications(data||[]);
+    setSelectedJob(jobId);
+  };
+  const updateStatus = async (appId, status) => { await sb.from('applications').update({status}).eq('id',appId); setApplications(p=>p.map(a=>a.id===appId?{...a,status}:a)); };
+  const deleteJob = async (jobId) => { await sb.from('jobs').delete().eq('id',jobId); setJobs(p=>p.filter(j=>j.id!==jobId)); };
+  if (!employer) return h('div', { className: 'spinner' });
+  return h('div', { className: 'dashboard' },
+    h('div', { className: 'container' },
+      h('div', { className: 'dashboard-header' }, h('h2', null, '🏢 ' + employer.company_name), h('p', { style: { color:'var(--text2)' } }, t.employer)),
+      h('div', { className: 'grid-3', style: { marginBottom:28 } }, [
+        { label:t.postedJobs, val:jobs.length, icon:'📋' },
+        { label:t.applications, val:jobs.reduce((s,j)=>s+(j.applications?.[0]?.count||0),0), icon:'👥' },
+        { label:t.active, val:jobs.filter(j=>j.is_active).length, icon:'✅' }
+      ].map(s => h('div', { key: s.label, className: 'card', style: { textAlign:'center' } }, h('div', { style: { fontSize:28, marginBottom:8 } }, s.icon), h('div', { style: { fontSize:28, fontWeight:900, fontFamily:'Space Mono', color:'var(--accent)' } }, s.val), h('div', { style: { fontSize:13, color:'var(--text2)', marginTop:4 } }, s.label)))),
+      h('div', { className: 'tabs' }, [['jobs',t.myJobs],['post',t.postJob],['profile',t.profile]].map(([k,v]) => h('button', { key: k, className: `tab ${tab===k ? 'active' : ''}`, onClick: () => setTab(k) }, v))),
+      tab === 'jobs' && (selectedJob ? h('div', null, h('button', { className: 'btn btn-outline btn-sm', style: { marginBottom:20 }, onClick: () => setSelectedJob(null) }, (lang==='ar' ? '← رجوع' : '← Back')), applications.length === 0 ? h('div', { className: 'empty' }, h('div', { className: 'empty-icon' }, '📭'), h('p', null, t.noApplications)) : h('div', { className: 'grid-2' }, applications.map(app => h('div', { key: app.id, className: 'card' }, h('div', { className: 'card-title' }, app.candidates?.profiles?.full_name), h('div', { className: 'card-subtitle' }, app.candidates?.title), app.candidates?.skills?.length > 0 && h('div', { className: 'skills-wrap', style: { margin:'10px 0' } }, app.candidates.skills.slice(0,4).map(s=>h('span', { key: s, className: 'skill-tag' }, s))), h('div', { style: { display:'flex', gap:8, marginTop:12 } }, h('button', { className: 'btn btn-success btn-sm', onClick: () => updateStatus(app.id,'accepted') }, '✓'), h('button', { className: 'btn btn-danger btn-sm', onClick: () => updateStatus(app.id,'rejected') }, '✗'), h('span', { style: { marginRight:'auto' } }, ({ pending: h('span', { className: 'badge badge-purple' }, t.pending), accepted: h('span', { className: 'badge badge-green' }, t.accepted), rejected: h('span', { className: 'badge badge-red' }, t.rejected) }[app.status])))))) : jobs.length === 0 ? h('div', { className: 'empty' }, h('div', { className: 'empty-icon' }, '📋'), h('p', null, t.noJobs)) : h('div', { className: 'grid-2' }, jobs.map(job => h('div', { key: job.id, className: 'card' }, h('div', { className: 'job-card-top' }, h('div', null, h('div', { className: 'card-title' }, job.title), h('div', { className: 'card-subtitle' }, '📍 ' + (job.location||'—'))), h('span', { className: `badge ${job.is_active ? 'badge-green' : 'badge-red'}` }, job.is_active ? t.active : t.inactive)), h('div', { style: { display:'flex', gap:10, marginTop:16 } }, h('button', { className: 'btn btn-outline btn-sm', onClick: () => loadApplications(job.id) }, '👥 ' + (job.applications?.[0]?.count||0) + ' ' + t.applications), h('button', { className: 'btn btn-danger btn-sm', onClick: () => deleteJob(job.id) }, t.deleteJob))))),
+      tab === 'post' && h('div', { style: { maxWidth:560 } }, h(PostJobForm, { employer, lang, showToast, onPosted: loadJobs })),
+      tab === 'profile' && h('div', { style: { maxWidth:560 } }, h(ProfileEditor, { profile, employer, lang, showToast, onSaved: refreshData }))
+    )
+  );
+}
+
+// ============================
+// MAIN APP
+// ============================
+function App() {
+  const [lang, setLang] = React.useState('ar');
+  const [user, setUser] = React.useState(null);
+  const [profile, setProfile] = React.useState(null);
+  const [candidate, setCandidate] = React.useState(null);
+  const [employer, setEmployer] = React.useState(null);
+  const [page, setPage] = React.useState('home');
+  const [authModal, setAuthModal] = React.useState(null);
+  const [toast, setToast] = React.useState(null);
+  const [stats, setStats] = React.useState({ candidates:0, jobs:0, assessments:0 });
+  const t = T[lang];
+
+  React.useEffect(() => {
+    sb.auth.getSession().then(({ data: { session } }) => { if (session?.user) { setUser(session.user); loadProfile(session.user.id); } });
+    const { data: { subscription } } = sb.auth.onAuthStateChange((_event, session) => { if (session?.user) { setUser(session.user); loadProfile(session.user.id); } else { setUser(null); setProfile(null); setCandidate(null); setEmployer(null); setPage('home'); } });
+    loadStats();
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const loadStats = async () => {
+    const [{ count: c }, { count: j }, { count: a }] = await Promise.all([
+      sb.from('candidates').select('*', {count:'exact',head:true}),
+      sb.from('jobs').select('*', {count:'exact',head:true}).eq('is_active',true),
+      sb.from('assessments').select('*', {count:'exact',head:true})
+    ]);
+    setStats({ candidates:c||0, jobs:j||0, assessments:a||0 });
+  };
+  const loadProfile = async (uid) => {
+    const { data: prof } = await sb.from('profiles').select('*').eq('id',uid).single();
+    if (!prof) return;
+    setProfile(prof);
+    if (prof.role === 'candidate') { const { data: cand } = await sb.from('candidates').select('*').eq('user_id',uid).single(); setCandidate(cand); }
+    else if (prof.role === 'employer') { const { data: emp } = await sb.from('employers').select('*').eq('user_id',uid).single(); setEmployer(emp); }
+    setPage('dashboard');
+  };
+  const handleLogout = async () => { await sb.auth.signOut(); setPage('home'); };
+  const showToast = (msg, type='success') => setToast({ msg, type });
+  const refreshData = () => { if(user) loadProfile(user.id); };
+
+  return h(LangCtx.Provider, { value: lang },
+    h('div', { className: 'app', dir: lang==='ar' ? 'rtl' : 'ltr' },
+      h(Navbar, { user, profile, onAuth: setAuthModal, onLogout: handleLogout, lang, setLang, setPage, page }),
+      page === 'home' && h(React.Fragment, null, h(Hero, { onAuth: setAuthModal, lang }), h(StatsBar, { stats, lang }), h('div', { className: 'container', style: { padding:'40px 24px' } }, h('div', { style: { textAlign:'center', marginBottom:32 } }, h('h2', { style: { fontSize:28, fontWeight:800 } }, lang==='ar' ? 'وظائف متاحة' : 'Available Jobs')), h(JobsList, { user, profile, candidate, lang, showToast }))),
+      page === 'dashboard' && profile?.role === 'candidate' && h(CandidateDashboard, { profile, candidate, lang, showToast, refreshData }),
+      page === 'dashboard' && profile?.role === 'employer' && h(EmployerDashboard, { profile, employer, lang, showToast, refreshData }),
+      authModal && h(AuthModal, { defaultTab: authModal, onClose: () => setAuthModal(null) }),
+      toast && h(Toast, { msg: toast.msg, type: toast.type, onDone: () => setToast(null) })
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+</script>
+</body>
+</html>
